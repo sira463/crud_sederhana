@@ -13,11 +13,10 @@ jobs:
     services:
       sqlite:
         image: nouchka/sqlite3:latest
+        # PERBAIKAN: Menghilangkan semua spasi pada options dan 
+        # menggunakan 'args' untuk menjalankan perintah keep-alive.
         options: --health-cmd="sqlite3 --version" --health-interval=10s --health-timeout=5s --health-retries=3
-        
-        # PERBAIKAN: Menggunakan 'command' dalam format string standar 
-        # untuk memastikan kontainer tetap hidup.
-        command: tail -f /dev/null
+        args: ["tail", "-f", "/dev/null"]
 
     steps:
     - name: Checkout repository
