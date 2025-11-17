@@ -1,34 +1,34 @@
 name: PHP CRUD Test
 
 on:
-push:
-branches: [ main ]
-pull_request:
-branches: [ main ]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-build:
-runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-services:
-  sqlite:
-    image: nouchka/sqlite3:latest
-    options: --health-cmd="sqlite3 --version" --health-interval=10s --health-timeout=5s --health-retries=3
-    # PERBAIKAN: Menimpa perintah default agar kontainer tetap berjalan (Up)
-    command: ["tail", "-f", "/dev/null"]
+    services:
+      sqlite:
+        image: nouchka/sqlite3:latest
+        options: --health-cmd="sqlite3 --version" --health-interval=10s --health-timeout=5s --health-retries=3
+        # Perbaikan untuk menjaga kontainer tetap berjalan:
+        command: ["tail", "-f", "/dev/null"]
 
-steps:
-- name: Checkout repository
-  uses: actions/checkout@v3
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-- name: Set up PHP
-  uses: shivammathur/setup-php@v2
-  with:
-    php-version: '8.2'
-    extensions: pdo_sqlite
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: pdo_sqlite
 
-- name: Install dependencies
-  run: composer install
+    - name: Install dependencies
+      run: composer install
 
-- name: Run PHPUnit tests
-  run: vendor/bin/phpunit tests --colors=always
+    - name: Run PHPUnit tests
+      run: vendor/bin/phpunit tests --colors=always
