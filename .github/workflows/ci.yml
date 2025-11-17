@@ -11,20 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      # MENGGANTI SQLITE DENGAN POSTGRESQL (Server Database Sejati)
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: runner
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: testdb
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready 
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+      sqlite:
+        image: nouchka/sqlite3:latest
+        # Catatan: Struktur ini lolos validasi YAML, tetapi kontainer akan tetap 
+        # gagal/keluar karena ia adalah klien, bukan server. 
+        # Gunakan Postgres jika Anda membutuhkan layanan database yang berfungsi penuh.
+        options: --health-cmd="sqlite3 --version" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
     - name: Checkout repository
@@ -34,16 +26,14 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
-        # GANTI PDO_SQLITE dengan PDO_PGSQL
-        extensions: pdo_pgsql
+        extensions: pdo_sqlite
 
     - name: Install dependencies
       run: composer install
-      
-    # Langkah untuk menunggu 5 detik agar Postgres benar-benar siap
-    - name: Wait for Postgres
-      run: sleep 5
+
+    # PERBAIKAN: Langkah ini memberikan izin eksekusi (+x) pada binary PHPUnit
+    - name: Grant execution permission to PHPUnit
+      run: chmod +x vendor/bin/phpunit
 
     - name: Run PHPUnit tests
-      # Pastikan kode PHP Anda terkoneksi ke HOST: localhost (atau postgres), PORT: 5432
       run: vendor/bin/phpunit tests --colors=always
