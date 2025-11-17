@@ -14,8 +14,9 @@ jobs:
       sqlite:
         image: nouchka/sqlite3:latest
         options: --health-cmd="sqlite3 --version" --health-interval=10s --health-timeout=5s --health-retries=3
-        # Perbaikan untuk menjaga kontainer tetap berjalan:
-        command: ["tail", "-f", "/dev/null"]
+        
+        # PERBAIKAN: Menimpa entrypoint kontainer agar tetap berjalan
+        entrypoint: tail -f /dev/null
 
     steps:
     - name: Checkout repository
